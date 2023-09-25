@@ -1,6 +1,6 @@
 from scipy.stats import stats
 
-from src.dataset import Dataset
+from si.data.dataset import Dataset
 
 
 def f_classification(dataset: Dataset):
