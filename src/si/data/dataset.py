@@ -167,6 +167,115 @@ class Dataset:
             df[self.label] = self.y
             return df
 
+
+
+
+
+
+
+
+
+
+    def dropna(self):
+        """
+        Remove samples containing at least one null value (NaN) and update the y vector accordingly.
+
+        Returns
+        -------
+        self: Modified Dataset object
+        """
+        # Find indices of rows with NaN values in the feature matrix X
+        nan_indices = np.isnan(self.X).any(axis=1)
+        
+        # Remove rows with NaN values from the feature matrix X
+        self.X = self.X[~nan_indices]
+        
+        # Update the label vector y by removing corresponding entries
+        if self.y is not None:
+            self.y = self.y[~nan_indices]
+        
+        return self
+    
+
+
+
+
+
+
+
+
+
+
+    def fillna(self, value):
+
+        """
+        Replace all null values with a specified value, the mean, or the median of the feature/variable.
+
+        Parameters
+        ----------
+        value : float or "mean" or "median"
+            The value to replace null values with. If "mean" or "median" is provided, it calculates
+            the mean or median of each feature and replaces null values with the respective feature's mean or median.
+
+        Returns
+        -------
+        self: Modified Dataset object
+        """
+        if value == "mean":
+            # Calculate the mean of each feature and replace NaN values with the mean
+            feature_means = np.nanmean(self.X, axis=0)
+            self.X[np.isnan(self.X)] = feature_means
+        elif value == "median":
+            # Calculate the median of each feature and replace NaN values with the median
+            feature_medians = np.nanmedian(self.X, axis=0)
+            self.X[np.isnan(self.X)] = feature_medians
+        else:
+            # Replace NaN values with the specified value
+            self.X[np.isnan(self.X)] = value
+        
+        return self
+    
+
+
+
+
+
+
+
+    
+    def remove_by_index(self, index):
+        """
+        Remove a sample by its index and update the y vector accordingly.
+
+        Parameters
+        ----------
+        index : int
+            The index of the sample to remove.
+
+        Returns
+        -------
+        self: Modified Dataset object
+        """
+        # Check if the provided index is valid
+        if index < 0 or index >= len(self.X):
+            raise ValueError("Invalid index provided for sample removal")
+        
+        # Remove the sample at the specified index from the feature matrix X
+        self.X = np.delete(self.X, index, axis=0)
+        
+        # Update the label vector y by removing the corresponding entry
+        if self.y is not None:
+            self.y = np.delete(self.y, index)
+        
+        return self
+
+
+
+
+
+
+
+
     @classmethod
     def from_random(cls,
                     n_samples: int,
