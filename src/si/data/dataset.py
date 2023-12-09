@@ -174,7 +174,7 @@ class Dataset:
 
 
 
-
+    #1
 
     def dropna(self):
         """
@@ -204,7 +204,7 @@ class Dataset:
 
 
 
-
+    2#
 
     def fillna(self, value):
 
@@ -240,7 +240,7 @@ class Dataset:
 
 
 
-
+    3#
 
     
     def remove_by_index(self, index):
