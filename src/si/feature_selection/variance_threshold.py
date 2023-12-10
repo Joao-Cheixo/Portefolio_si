@@ -4,47 +4,101 @@ from si.data.dataset import Dataset
 
 
 class VarianceThreshold:
+    """
+    Variance Threshold feature selection.
+    Features with a training-set variance lower than this threshold will be removed from the dataset.
+
+    Parameters
+    ----------
+    threshold: float
+        The threshold value to use for feature selection. Features with a
+        training-set variance lower than this threshold will be removed.
+
+    Attributes
+    ----------
+    variance: array-like, shape (n_features,)
+        The variance of each feature.
+    """
+
     def __init__(self, threshold: float = 0.0):
         """
-        Initializes the variance threshold.
-        :param threshold: Threshold for the variance.
+        Variance Threshold feature selection.
+        Features with a training-set variance lower than this threshold will be removed from the dataset.
+
+        Parameters
+        ----------
+        threshold: float
+            The threshold value to use for feature selection. Features with a
+            training-set variance lower than this threshold will be removed.
         """
+        if threshold < 0:
+            raise ValueError("Threshold must be non-negative")
+
+        # parameters
         self.threshold = threshold
-        self.variance = None  # None because we don't have a dataset yet
 
-    def fit(self, dataset: Dataset):
+        # attributes
+        self.variance = None
+
+    def fit(self, dataset: Dataset) -> 'VarianceThreshold':
         """
-        Calculates the variance of each feature.
-        :param dataset: Dataset object.
+        Fit the VarianceThreshold model according to the given training data.
+        Parameters
+        ----------
+        dataset : Dataset
+            The dataset to fit.
+
+        Returns
+        -------
+        self : object
         """
-
-        # variance = dataset.get_variance()
-        # self.variance = variance
-        self.variance = np.var(dataset.x, axis=0)
-
+        self.variance = np.var(dataset.X, axis=0)
         return self
 
-    def transform(self, dataset: Dataset):
+    def transform(self, dataset: Dataset) -> Dataset:
         """
-        Selects the features that have a variance greater than the threshold.
-        :param dataset: Dataset object.
-        :return: Dataset object.
+        It removes all features whose variance does not meet the threshold.
+        Parameters
+        ----------
+        dataset: Dataset
+
+        Returns
+        -------
+        dataset: Dataset
         """
-        if self.variance is None:
-            raise Exception("You must fit the variance threshold before transform the dataset.")
+        X = dataset.X
 
-        selected_features = np.where(self.variance > self.threshold)[0] # [0] because np.where returns a tuple
-        selected_features_names = [dataset.features_names[i] for i in selected_features]
-        selected_features_data = dataset.x[:, selected_features]
+        features_mask = self.variance > self.threshold
+        X = X[:, features_mask]
+        features = np.array(dataset.features)[features_mask]
+        return Dataset(X=X, y=dataset.y, features=list(features), label=dataset.label)
 
-        return Dataset(selected_features_data, dataset.y, selected_features_names, dataset.label_name)
-
-    def fit_transform(self, dataset: Dataset):
+    def fit_transform(self, dataset: Dataset) -> Dataset:
         """
-        Calculates the variance of each feature and selects the features that have a variance
-        greater than the threshold.
-        :param dataset: Dataset object.
-        :return: Dataset object.
+        Fit to data, then transform it.
+        Parameters
+        ----------
+        dataset: Dataset
+
+        Returns
+        -------
+        dataset: Dataset
         """
         self.fit(dataset)
         return self.transform(dataset)
+
+
+if __name__ == '__main__':
+    from si.data.dataset import Dataset
+
+    dataset = Dataset(X=np.array([[0, 2, 0, 3],
+                                  [0, 1, 4, 3],
+                                  [0, 1, 1, 3]]),
+                      y=np.array([0, 1, 0]),
+                      features=["f1", "f2", "f3", "f4"],
+                      label="y")
+
+    selector = VarianceThreshold()
+    selector = selector.fit(dataset)
+    dataset = selector.transform(dataset)
+    print(dataset.features)

@@ -1,16 +1,36 @@
-from scipy.stats import stats
+from typing import Tuple, Union
+
+import numpy as np
+from scipy import stats
 
 from si.data.dataset import Dataset
 
 
-def f_classification(dataset: Dataset):
+def f_classification(dataset: Dataset) -> Union[Tuple[np.ndarray, np.ndarray],
+                                                Tuple[float, float]]:
     """
-    Calculates the score for each feature for classification tasks.
-    :param dataset: Dataset object.
-    :return: F value for each feature.
-    """
-    dataset_classes = dataset.get_classes()
-    dataset_groups = [dataset.x[dataset.y == c] for c in dataset_classes]  # group the dataset by class
-    f_value, p_value = stats.f_oneway(*dataset_groups) # calculate the f value for each feature
+    Scoring function for classification problems. It computes one-way ANOVA F-value for the
+    provided dataset. The F-value scores allows analyzing if the mean between two or more groups (factors)
+    are significantly different. Samples are grouped by the labels of the dataset.
 
-    return f_value, p_value
+    Parameters
+    ----------
+    dataset: Dataset
+        A labeled dataset
+
+    Returns
+    -------
+    F: np.array, shape (n_features,)
+        F scores
+    p: np.array, shape (n_features,)
+        p-values
+    """
+    classes = dataset.get_classes()
+    groups = [dataset.X[dataset.y == c] for c in classes]
+    F, p = stats.f_oneway(*groups)
+    return F, p
+
+
+if __name__ == '__main__':
+    data = Dataset(np.array([[1, 2, 1], [4, 5, 6], [7, 8, 7], [10, 11, 12]]), np.array([1, 0, 1, 0]))
+    print(f_classification(data))
