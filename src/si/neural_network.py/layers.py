@@ -210,3 +210,118 @@ class DenseLayer(Layer):
             The shape of the output of the layer.
         """
         return (self.n_units,)
+    
+
+
+
+class DropoutLay(Layer):
+    """Dropout layer of a neural network
+
+    Args:
+        probability (float): The probability of dropping out a neuron during training.
+
+    Attributes:
+        input (np.ndarray): The input to the dropout layer.
+        mask (np.ndarray): The binary mask used for dropout.
+        output (np.ndarray): The output of the dropout layer.
+
+    """
+
+    def __init__(self, probability: float):
+        super().__init__()
+
+        self.probability = probability
+
+        self.input = None
+        self.mask = None
+        self.output = None
+
+    def forward_propagation(self, input: np.ndarray, training: bool) -> np.ndarray:
+        """
+        Perform forward propagation through the dropout layer.
+
+        Args:
+            input (np.ndarray): The input to the dropout layer.
+            training (bool): Whether the model is in training mode or not.
+
+        Returns:
+            np.ndarray: The output of the dropout layer.
+        """
+        
+
+        if training:
+            
+            #compute the scaling factor
+            scale_factor = 1 / (1 - self.probability)
+
+            #generate the binary mask
+            self.mask = np.random.binomial(1, 1 - self.probability, size=input.shape)
+
+            self.output = input * self.mask * scale_factor
+
+            return self.output
+        
+        # if we are in inference mode, return the input
+
+        else:
+            self.output = input
+
+            return self.output
+
+    
+    def backward_propagation(self, output_error: np.ndarray) -> float:
+        """
+        Performs backward propagation to update the weights of the layer.
+
+        Args:
+            output_error (np.ndarray): The error of the layer's output.
+
+        Returns:
+            float: The updated error of the layer's input.
+        """
+        # compute the input error
+        input_error = output_error * self.mask
+
+        return input_error
+    
+
+    def output_shape(self) -> tuple:
+        """
+        Returns the shape of the output of the layer.
+
+        Returns:
+            tuple: The shape of the output of the layer.
+        """
+        # the output shape is the same as the input shape
+        return self.input_shape()
+    
+    def parameters(self) -> int:
+            # the dropout layer has no parameters
+            return 0
+    
+if __name__ == '__main__':
+        #Testes para DenseLayer
+        dense_layer = DenseLayer(n_units=5, input_shape=(10,))
+        dense_layer.initialize(Optimizer(learning_rate=0.01))  
+
+        print("Dense Layer - Output Shape:", dense_layer.output_shape())
+        print("Dense Layer - Number of Parameters:", dense_layer.parameters())
+
+        #criar um input de exemplo
+        input_example = np.random.rand(100, 10)
+
+        #Testa forward propagation na Dense Layer
+        output_dense = dense_layer.forward_propagation(input_example, training=True)
+        print("Dense Layer - Forward Propagation Output Shape:", output_dense.shape)
+
+        #Testes para Dropout
+        dropout_layer = DropoutLay(probability=0.5)
+
+        #Teste forward propagation Dropout Layer
+        output_dropout = dropout_layer.forward_propagation(output_dense, training=True)
+        print("Dropout Layer - Forward Propagation Output Shape:", output_dropout.shape)
+
+        # este backward propagation no Dropout Layer
+        dropout_error_example = np.random.rand(100, 5)  #Exemplo de erro de saída
+        dropout_input_error = dropout_layer.backward_propagation(dropout_error_example)
+        print("Dropout Layer - Backward Propagation Input Error Shape:", dropout_input_error.shape)

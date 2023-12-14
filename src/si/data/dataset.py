@@ -206,34 +206,39 @@ class Dataset:
 
     2#
 
-    def fillna(self, value):
-
+    def fillna(self, values: list[float]) -> 'Dataset':
         """
-        Replace all null values with a specified value, the mean, or the median of the feature/variable.
-
-        Parameters
-        ----------
-        value : float or "mean" or "median"
-            The value to replace null values with. If "mean" or "median" is provided, it calculates
-            the mean or median of each feature and replaces null values with the respective feature's mean or median.
-
-        Returns
-        -------
-        self: Modified Dataset object
-        """
-        if value == "mean":
-            # Calculate the mean of each feature and replace NaN values with the mean
-            feature_means = np.nanmean(self.X, axis=0)
-            self.X[np.isnan(self.X)] = feature_means
-        elif value == "median":
-            # Calculate the median of each feature and replace NaN values with the median
-            feature_medians = np.nanmedian(self.X, axis=0)
-            self.X[np.isnan(self.X)] = feature_medians
-        else:
-            # Replace NaN values with the specified value
-            self.X[np.isnan(self.X)] = value
+        Replaces all null values with another value or the mean or median of the feature/variable
         
-        return self
+        Parameters:
+        -----------
+        values: list of medians or means to use as replacements for NaN values
+        
+        Return:
+        Modified Dataset 
+        """
+        #verifica se todos os valores em values são do tipo int ou float. Se algum valor não for, cria um ValueError
+        if not all(isinstance(value, (int, float)) for value in values): 
+            raise ValueError("value could be only float")
+        num_columns = self.X.shape[1]
+        #verifica se o número de valores em values é pelo menos igual ao número de colunas em self.X, se não for cria um ValueError
+        if len(values) < num_columns:
+            raise ValueError("values have at least as many values as columns in X")
+        #verifica se os valores em values correspondem à média ou à mediana das features atuais do conjunto de dados. 
+        #Se não corresponderem, cria um ValueError.
+        if not np.array_equal(values, self.get_mean()) and not np.array_equal(values, self.get_median()):
+            raise ValueError("values are the array of means or medians of the variables")
+
+        for cols in range(num_columns): 
+            col_values = self.X[:, cols] #cria a variável col_values com todas as linhas e a coluna cols de X
+            nan_v = np.isnan(col_values) #cria a nan_v onde verifica quais valores são NaN na coluna atual
+
+            if np.any(nan_v): 
+                replace_value = values[cols] #substitui esses valores por valores especificados em values para essa coluna
+                col_values[nan_v] = replace_value
+                self.X[:, cols] = col_values #atualiza a coluna no conjunto de dados com os valores substituídos.
+
+        return self 
     
 
 
@@ -265,7 +270,7 @@ class Dataset:
         
         # Update the label vector y by removing the corresponding entry
         if self.y is not None:
-            self.y = np.delete(self.y, index)
+            self.y = np.delete(self.y, index, axis=0)
         
         return self
 
