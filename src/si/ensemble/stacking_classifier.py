@@ -32,19 +32,11 @@ class StackingClassifier:
         :param dataset: Dataset object to fit the models to.
         :return: self: StackingClassifier
         """
-        # trains the models
-        for model in self.models:
-            model.fit(dataset)
+        
+        self.F, self.p = self.score_func(dataset) #recorre à função score_func, utilizando o conjunto de dados fornecido
+        #e calcula os valores de F e p para cada feature no conjunto de dados
+        return self 
 
-        # gets the models predictions
-        predictions = []
-        for model in self.models:
-            predictions.append(model.predict(dataset))
-
-        # trains the final model
-        self.final_model.fit(Dataset(np.array(predictions).T, dataset.y))
-
-        return self
 
 
 
