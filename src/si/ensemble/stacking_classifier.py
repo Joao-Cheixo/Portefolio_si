@@ -2,7 +2,6 @@ import numpy as np
 from si.data.dataset import Dataset
 from si.metrics.accuracy import accuracy
 from si.statistics.sigmoid_function import sigmoid_function
-
 import numpy as np 
 
 
@@ -112,8 +111,8 @@ if __name__ == '__main__':
     
     DT=DecisionTreeClassifier(min_sample_split=3, max_depth=3, mode='gini')
 
-    # Final Model (Choose a different model as the final model)
-    final_model = LogisticRegression(l2_penalty=1, alpha=0.001, max_iter=1000)
+    # Final Model 
+    final_model = KNNClassifier(k=3)
 
     # Initialize StackingClassifier
     models = [knn, LG, DT]
