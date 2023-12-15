@@ -78,7 +78,7 @@ class KNNRegressor:
         
         knn_labels = self.dataset.y[knn]
         
-        match_class_mean = np.mean(knn_labels) 
+        match_class_mean = np.mean(knn_labels, axis=0) 
 
         return match_class_mean 
     

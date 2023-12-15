@@ -18,7 +18,7 @@ def rmse(y_true: float, Y_pred: float) -> float:
      
     if len(y_true) != len(Y_pred): 
         raise ValueError("Input lists must have the same length") 
-    if not y_true or not Y_pred: 
+    if not any(y_true) or not any(Y_pred): 
         return 0.0  
 
     squared_diff = [(true - pred) ** 2 for true, pred in zip(y_true, Y_pred)] 

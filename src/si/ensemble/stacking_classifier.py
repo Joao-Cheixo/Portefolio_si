@@ -85,7 +85,7 @@ if __name__ == '__main__':
     from si.models.logistic_regression import LogisticRegression
     from si.models.decision_tree_classifier import DecisionTreeClassifier
 
-    data = ""  
+    data = "/home/joao/Portefolio_si/datasets/breast_bin/breast-bin.csv"  
     breast=read_csv(data, sep=",",features=True,label=True)
     train_data, test_data = stratified_train_test_split(breast, test_size=0.20, random_state=42)
 

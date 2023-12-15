@@ -217,28 +217,20 @@ class Dataset:
         Return:
         Modified Dataset 
         """
-        #verifica se todos os valores em values são do tipo int ou float. Se algum valor não for, cria um ValueError
-        if not all(isinstance(value, (int, float)) for value in values): 
-            raise ValueError("value could be only float")
-        num_columns = self.X.shape[1]
-        #verifica se o número de valores em values é pelo menos igual ao número de colunas em self.X, se não for cria um ValueError
-        if len(values) < num_columns:
-            raise ValueError("values have at least as many values as columns in X")
-        #verifica se os valores em values correspondem à média ou à mediana das features atuais do conjunto de dados. 
-        #Se não corresponderem, cria um ValueError.
-        if not np.array_equal(values, self.get_mean()) and not np.array_equal(values, self.get_median()):
-            raise ValueError("values are the array of means or medians of the variables")
+        if isinstance(values, str):
+            if values == 'mean':
+                replacement_values = np.nanmean(self.X, axis=0)
+            elif values == 'median':
+                replacement_values = np.nanmedian(self.X, axis=0)
+            else:
+                raise ValueError("value must be either 'mean' or 'median' or a float")
+    
+    # replace if value is float
+        else:
+            replacement_values = values
 
-        for cols in range(num_columns): 
-            col_values = self.X[:, cols] #cria a variável col_values com todas as linhas e a coluna cols de X
-            nan_v = np.isnan(col_values) #cria a nan_v onde verifica quais valores são NaN na coluna atual
-
-            if np.any(nan_v): 
-                replace_value = values[cols] #substitui esses valores por valores especificados em values para essa coluna
-                col_values[nan_v] = replace_value
-                self.X[:, cols] = col_values #atualiza a coluna no conjunto de dados com os valores substituídos.
-
-        return self 
+    # Replace NaN values with the specified/replacement values
+        self.X = np.where(np.isnan(self.X), replacement_values, self.X)
     
 
 
