@@ -2,7 +2,7 @@
 import numpy as np
 from si.data.dataset import Dataset
 from si.statistics.f_classification import f_classification
-
+from typing import Callable
 
 class SelectPercentile:
     """
@@ -18,7 +18,7 @@ class SelectPercentile:
     """
 
 
-    def __init__(self, score_func = f_classification, percentile: int = 50) -> None:
+    def __init__(self, score_func: Callable = f_classification, percentile: int = 50) -> None:
         """
         Initializes a SelectPercentile instance with the given score function and percentile.
 
@@ -45,7 +45,7 @@ class SelectPercentile:
         -------
         self : object
         """
-        self.F, self.p = self.scorefunc(dataset)
+        self.F, self.p = self.score_func(dataset)
         return self
 
 
