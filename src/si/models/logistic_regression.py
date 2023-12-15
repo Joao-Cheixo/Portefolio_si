@@ -2,7 +2,8 @@ import numpy as np
 
 from si.data.dataset import Dataset
 from si.metrics.accuracy import accuracy
-from tests.sigmoid_function import sigmoid_function
+from si.statistics.sigmoid_function import sigmoid_function
+from si.statistics.sigmoid_function import sigmoid_function
 
 
 class LogisticRegression:

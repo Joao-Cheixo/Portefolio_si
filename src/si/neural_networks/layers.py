@@ -214,7 +214,7 @@ class DenseLayer(Layer):
 
 
 
-class DropoutLay(Layer):
+class Dropout(Layer):
     """Dropout layer of a neural network
 
     Args:
@@ -315,7 +315,7 @@ if __name__ == '__main__':
         print("Dense Layer - Forward Propagation Output Shape:", output_dense.shape)
 
         #Testes para Dropout
-        dropout_layer = DropoutLay(probability=0.5)
+        dropout_layer = Dropout(probability=0.5)
 
         #Teste forward propagation Dropout Layer
         output_dropout = dropout_layer.forward_propagation(output_dense, training=True)

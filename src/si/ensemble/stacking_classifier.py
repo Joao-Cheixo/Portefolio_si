@@ -1,6 +1,7 @@
 import numpy as np
 from si.data.dataset import Dataset
 from si.metrics.accuracy import accuracy
+from si.statistics.sigmoid_function import sigmoid_function
 
 import numpy as np 
 
@@ -28,15 +29,29 @@ class StackingClassifier:
 
     def fit(self, dataset: Dataset) -> 'StackingClassifier':
         """
-        Fit the models to the dataset.
-        :param dataset: Dataset object to fit the models to.
-        :return: self: StackingClassifier
-        """
-        
-        self.F, self.p = self.score_func(dataset) #recorre à função score_func, utilizando o conjunto de dados fornecido
-        #e calcula os valores de F e p para cada feature no conjunto de dados
-        return self 
+        Fit the models according to the training data.
 
+        Parameters
+        ----------
+        dataset : Dataset
+            The training data.
+
+        Returns
+        -------
+        self : StackingClassifier
+            The fitted model.
+        """
+        for model in self.models:
+            model.fit(dataset) 
+        
+        predictions=[]
+        for model in self.models:
+            prever=model.predict(dataset)
+            predictions.append(prever)
+        
+        predictions=np.array(predictions).T 
+        self.final_model.fit(Dataset(dataset.X, predictions))
+        return self
 
 
 
@@ -49,15 +64,14 @@ class StackingClassifier:
         :param dataset: Dataset object to predict the labels of.
         :return: the final model prediction
         """
-        # gets the model predictions
         predictions = []
         for model in self.models:
-            predictions.append(model.predict(dataset))
-
-        # gets the final model previsions
-        y_pred = self.final_model.predict(Dataset(np.array(predictions).T, dataset.y))
-
-        return y_pred
+            prever=model.predict(dataset)
+            predictions.append(prever)
+        
+        predictions=np.array(predictions).T
+        y_pred_final=self.final_model.predict(Dataset(dataset.X, predictions))                
+        return y_pred_final
     
 
 

@@ -187,7 +187,7 @@ if __name__ == '__main__':
     from sklearn.ensemble import RandomForestClassifier as RFC
 
 
-    data = read_csv('\iris.csv', sep=',', features=True, label=True)
+    data = read_csv('/home/joao/Portefolio_si/datasets/iris/iris.csv', sep=',', features=True, label=True)
     train, test = train_test_split(data, test_size=0.33, random_state=42)
     model = RandomForestClassifier(min_sample_split=3, max_depth=3, mode='gini', n_estimators=5)
 
